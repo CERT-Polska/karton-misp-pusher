@@ -8,7 +8,8 @@ from pymisp import ExpandedPyMISP, MISPEvent
 
 class MispPusher(Karton):
     """
-    Transforms configurations using mwdb-iocextract and pushes to misp.cert.pl
+    Transforms configurations using mwdb-iocextract and pushes to a
+    configured MISP instance.
     """
 
     identity = "karton.misp-pusher"
@@ -36,7 +37,8 @@ class MispPusher(Karton):
         event.add_tag(f"mwdb:family:{family}")
         event.info = f"Malware configuration ({family})"
 
-        event.add_attribute("link", f"https://mwdb.cert.pl/config/{dhash}")
+        if self.mwdb_url is not None:
+            event.add_attribute("link", f"{self.mwdb_url}/config/{dhash}")
 
         for o in iocs.to_misp():
             event.add_object(o)
@@ -45,7 +47,12 @@ class MispPusher(Karton):
         misp.add_event(event)
 
     def __init__(
-        self, config: Config, misp_url: str, misp_key: str, misp_verifycert: bool = True
+        self,
+        config: Config,
+        misp_url: str,
+        misp_key: str,
+        misp_verifycert: bool = True,
+        mwdb_url: str = None,
     ) -> None:
         """
         Create instance of the MispPusher.
@@ -54,6 +61,7 @@ class MispPusher(Karton):
         :param misp_url: URL of the paired MISP instance
         :param misp_key: API key of the paired MISP instance
         :param misp_verifycert: "False" to skip TLS cert validation (unrecommended)
+        :param mwdb_url: Optional mwdb url, for `link` MISP attribute
         """
 
         super().__init__(config)
@@ -61,12 +69,23 @@ class MispPusher(Karton):
         self.misp_url = misp_url
         self.misp_key = misp_key
         self.misp_verifycert = misp_verifycert
+        self.mwdb_url = mwdb_url
 
     @classmethod
     def args_parser(cls):
+        def http_url(value):
+            """Ensure that provided value looks like a HTTP URL (https://sth),
+            and strip a trailing slash. The goal is to avoid confusion between
+            "url.com", "http://url.com", "http://url.com/", etc.
+            """
+            if not value.startswith("http"):
+                raise ValueError("URL should start with http[s]://")
+            return value.rstrip("/")
+
         parser = super().args_parser()
         parser.add_argument(
             "--misp-url",
+            type=http_url,
             required=True,
             help="URL of the paired MISP instance",
         )
@@ -80,6 +99,11 @@ class MispPusher(Karton):
             help="Skip MISP certificate verification",
             action="store_true",
         )
+        parser.add_argument(
+            "--mwdb-url",
+            type=http_url,
+            help="Optional mwdb url, for `link` MISP attributes",
+        )
         return parser
 
     @classmethod
@@ -88,5 +112,7 @@ class MispPusher(Karton):
         args = parser.parse_args()
 
         config = Config(args.config_file)
-        service = cls(config, args.misp_url, args.misp_key, not args.misp_insecure)
+        service = cls(
+            config, args.misp_url, args.misp_key, not args.misp_insecure, args.mwdb_url
+        )
         service.loop()
