@@ -1,6 +1,12 @@
 # karton-misp-pusher
 
-Collects static configuration from samples, and uploads it to MISP
+Listens for new samples in the [karton](https://karton-core.readthedocs.io/en/latest/)
+pipeline and uploads them to MISP.
+
+Configs are parsed using the [mwdb-iocextract](https://github.com/CERT-Polska/mwdb_iocextract)
+project. This means, that we operate on a higher level than raw JSON configs, and makes
+it possible to correlate different samples and campaigns (for example, by the used crypto
+material).
 
 **Author**: CERT.pl
 
@@ -12,6 +18,10 @@ Collects static configuration from samples, and uploads it to MISP
     "type": "config",
 }
 ```
+
+**Result:**
+
+![config in misp](./docs/misp.png)
 
 ## Usage
 
