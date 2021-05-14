@@ -11,6 +11,7 @@ Collects static configuration from samples, and uploads it to MISP
 {
     "type": "config",
 }
+```
 
 ## Usage
 
