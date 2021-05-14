@@ -1,0 +1,5 @@
+karton-core>=4.2.0,<5.0.0
+yara-python
+mwdblib==3.4.0
+mwdb-iocextract==1.1.0
+pymisp
