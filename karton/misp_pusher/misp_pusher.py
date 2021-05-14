@@ -1,14 +1,16 @@
-from karton.core import Karton, Task, Config
+from uuid import UUID, uuid5
+
+from karton.core import Config, Karton, Task
 from mwdb_iocextract import parse  # type: ignore
 from mwdblib.util import config_dhash  # type: ignore
 from pymisp import ExpandedPyMISP, MISPEvent
-from uuid import UUID, uuid5
 
 
 class MispPusher(Karton):
     """
     Transforms configurations using mwdb-iocextract and pushes to misp.cert.pl
     """
+
     identity = "karton.misp-pusher"
     filters = [{"type": "config"}]
 
@@ -43,11 +45,7 @@ class MispPusher(Karton):
         misp.add_event(event)
 
     def __init__(
-        self,
-        config: Config,
-        misp_url: str,
-        misp_key: str,
-        misp_verifycert: bool = True
+        self, config: Config, misp_url: str, misp_key: str, misp_verifycert: bool = True
     ) -> None:
         """
         Create instance of the MispPusher.
@@ -80,7 +78,7 @@ class MispPusher(Karton):
         parser.add_argument(
             "--misp-insecure",
             help="Skip MISP certificate verification",
-            action="store_true"
+            action="store_true",
         )
         return parser
 
@@ -90,7 +88,5 @@ class MispPusher(Karton):
         args = parser.parse_args()
 
         config = Config(args.config_file)
-        service = cls(
-            config, args.misp_url, args.misp_key, not args.misp_insecure
-        )
+        service = cls(config, args.misp_url, args.misp_key, not args.misp_insecure)
         service.loop()
