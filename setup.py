@@ -14,6 +14,7 @@ setup(
     name="karton-misp-pusher",
     version=version_info["__version__"],
     description="MISP reporter for the Karton framework",
+    url="https://github.com/CERT-Polska/karton-misp-pusher/",
     long_description=open("README.md", "r").read(),
     long_description_content_type="text/markdown",
     namespace_packages=["karton"],
