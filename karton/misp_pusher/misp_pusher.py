@@ -125,6 +125,11 @@ class MispPusher(Karton):
 
         config = Config(args.config_file)
         service = cls(
-            config, args.misp_url, args.misp_key, args.misp_published, not args.misp_insecure, args.mwdb_url
+            config,
+            args.misp_url,
+            args.misp_key,
+            args.misp_published,
+            not args.misp_insecure,
+            args.mwdb_url,
         )
         service.loop()
