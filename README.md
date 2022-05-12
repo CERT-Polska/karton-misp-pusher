@@ -39,4 +39,4 @@ $ karton-misp-pusher --misp-url https://misp.url --misp-key SECRET123
 You can also add optional xrefs to mwdb with `--mwdb-url`, or skip MISP
 verification with `--misp-insecure`. For more options see `--help`.
 
-![Co-financed by the Connecting Europe Facility by of the European Union](https://www.cert.pl/wp-content/uploads/2019/02/en_horizontal_cef_logo-1.png)
+![Co-financed by the Connecting Europe Facility by of the European Union](https://www.cert.pl/uploads/2019/02/en_horizontal_cef_logo-e1550495232540.png)
