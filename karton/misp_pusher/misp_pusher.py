@@ -104,7 +104,7 @@ class MispPusher(Karton):
             required=False,
             default=False,
             action="store_true",
-            help="Publish MISP Events"
+            help="Publish MISP Events",
         )
         parser.add_argument(
             "--misp-insecure",
