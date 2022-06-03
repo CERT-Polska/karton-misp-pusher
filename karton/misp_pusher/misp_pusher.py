@@ -43,6 +43,8 @@ class MispPusher(Karton):
         for o in iocs.to_misp():
             event.add_object(o)
 
+        event.published = self.misp_published
+
         misp = ExpandedPyMISP(self.misp_url, self.misp_key, self.misp_verifycert)
         misp.add_event(event)
 
@@ -51,6 +53,7 @@ class MispPusher(Karton):
         config: Config,
         misp_url: str,
         misp_key: str,
+        misp_published: bool = False,
         misp_verifycert: bool = True,
         mwdb_url: str = None,
     ) -> None:
@@ -60,6 +63,7 @@ class MispPusher(Karton):
         :param config: Karton configuration object
         :param misp_url: URL of the paired MISP instance
         :param misp_key: API key of the paired MISP instance
+        :param misp_published: Publish MISP Events Boolean
         :param misp_verifycert: "False" to skip TLS cert validation (unrecommended)
         :param mwdb_url: Optional mwdb url, for `link` MISP attribute
         """
@@ -68,6 +72,7 @@ class MispPusher(Karton):
 
         self.misp_url = misp_url
         self.misp_key = misp_key
+        self.misp_published = misp_published
         self.misp_verifycert = misp_verifycert
         self.mwdb_url = mwdb_url
 
@@ -95,6 +100,13 @@ class MispPusher(Karton):
             help="API key of the paired MISP instance",
         )
         parser.add_argument(
+            "--misp-published",
+            required=False,
+            default=False,
+            action="store_true",
+            help="Publish MISP Events",
+        )
+        parser.add_argument(
             "--misp-insecure",
             help="Skip MISP certificate verification",
             action="store_true",
@@ -113,6 +125,11 @@ class MispPusher(Karton):
 
         config = Config(args.config_file)
         service = cls(
-            config, args.misp_url, args.misp_key, not args.misp_insecure, args.mwdb_url
+            config,
+            args.misp_url,
+            args.misp_key,
+            args.misp_published,
+            not args.misp_insecure,
+            args.mwdb_url,
         )
         service.loop()
