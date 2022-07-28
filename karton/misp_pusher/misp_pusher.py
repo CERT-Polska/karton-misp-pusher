@@ -7,6 +7,16 @@ from mwdblib.util import config_dhash  # type: ignore
 from pymisp import ExpandedPyMISP, MISPEvent
 
 
+def http_url(value: str) -> str:
+    """Ensure that provided value looks like a HTTP URL (https://sth),
+    and strip a trailing slash. The goal is to avoid confusion between
+    "url.com", "http://url.com", "http://url.com/", etc.
+    """
+    if not value.startswith("http"):
+        raise ValueError("URL should start with http[s]://")
+    return value.rstrip("/")
+
+
 class MispPusher(Karton):
     """
     Transforms configurations using mwdb-iocextract and pushes to a
@@ -58,7 +68,7 @@ class MispPusher(Karton):
         event.published = self.config.getboolean("misp", "published", False)
 
         misp = ExpandedPyMISP(
-            self.config.get("misp", "url"),
+            http_url(self.config.get("misp", "url")),
             self.config.get("misp", "key"),
             not self.config.getboolean("misp", "insecure", False),
         )
@@ -66,19 +76,9 @@ class MispPusher(Karton):
 
     @classmethod
     def args_parser(cls) -> argparse.ArgumentParser:
-        def http_url(value):
-            """Ensure that provided value looks like a HTTP URL (https://sth),
-            and strip a trailing slash. The goal is to avoid confusion between
-            "url.com", "http://url.com", "http://url.com/", etc.
-            """
-            if not value.startswith("http"):
-                raise ValueError("URL should start with http[s]://")
-            return value.rstrip("/")
-
         parser = super().args_parser()
         parser.add_argument(
             "--misp-url",
-            type=http_url,
             help="URL of the paired MISP instance",
         )
         parser.add_argument(
