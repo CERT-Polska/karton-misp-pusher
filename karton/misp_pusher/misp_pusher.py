@@ -27,7 +27,7 @@ class MispPusher(Karton):
             raise RuntimeError("Misp config section is missing the url parameter")
 
         if not self.config.get("misp", "key"):
-            raise RuntimeError("Misp config section is missing the url parameter")
+            raise RuntimeError("Misp config section is missing the key parameter")
 
     def process(self, task: Task) -> None:
         config = task.get_payload("config")
