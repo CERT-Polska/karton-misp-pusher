@@ -55,11 +55,11 @@ class MispPusher(Karton):
         for o in iocs.to_misp():
             event.add_object(o)
 
-        event.published = self.config.getboolean("misp", "misp_published", False)
+        event.published = self.config.getboolean("misp", "published", False)
 
         misp = ExpandedPyMISP(
-            self.config.get("misp", "misp_url"),
-            self.config.get("misp", "misp_key"),
+            self.config.get("misp", "url"),
+            self.config.get("misp", "key"),
             not self.config.getboolean("misp", "insecure", False),
         )
         misp.add_event(event)
