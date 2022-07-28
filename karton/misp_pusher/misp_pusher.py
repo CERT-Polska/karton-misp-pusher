@@ -20,6 +20,15 @@ class MispPusher(Karton):
     # Event UUIDs are generated deterministically from a (root, cfg_hash) pair.
     CONFIG_NAMESPACE = UUID("dc232ceb-a523-41a1-98f4-8d3d52ec6eff")
 
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+        if not self.config.get("misp", "url"):
+            raise RuntimeError("Misp config section is missing the url parameter")
+
+        if not self.config.get("misp", "key"):
+            raise RuntimeError("Misp config section is missing the url parameter")
+
     def process(self, task: Task) -> None:
         config = task.get_payload("config")
         family = task.headers["family"]
@@ -70,18 +79,14 @@ class MispPusher(Karton):
         parser.add_argument(
             "--misp-url",
             type=http_url,
-            required=True,
             help="URL of the paired MISP instance",
         )
         parser.add_argument(
             "--misp-key",
-            required=True,
             help="API key of the paired MISP instance",
         )
         parser.add_argument(
             "--misp-published",
-            required=False,
-            default=False,
             action="store_true",
             help="Publish MISP Events",
         )
