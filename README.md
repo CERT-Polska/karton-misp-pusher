@@ -10,7 +10,7 @@ material).
 
 **Author**: CERT.pl
 
-**Maintainers**: msm
+**Maintainers**: nazywam
 
 **Consumes:**
 ```
