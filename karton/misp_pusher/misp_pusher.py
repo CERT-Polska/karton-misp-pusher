@@ -46,7 +46,10 @@ class MispPusher(Karton):
         if self.config.get("misp", "galaxy_clusters_mapping"):
             with open(self.config.get("misp", "galaxy_clusters_mapping"), "r") as f:
                 self.cluster_mapping = json.load(f)
-                self.log.info("Loaded MISP cluster mappings for %d families", len(self.cluster_mapping.keys()))
+                self.log.info(
+                    "Loaded MISP cluster mappings for %d families",
+                    len(self.cluster_mapping.keys()),
+                )
 
     def process(self, task: Task) -> None:
         config = task.get_payload("config")
@@ -74,7 +77,9 @@ class MispPusher(Karton):
 
         if self.cluster_mapping:
             if family not in self.cluster_mapping:
-                raise KeyError(f"Family name {family} not present in MISP cluster mapping")
+                raise KeyError(
+                    f"Family name {family} not present in MISP cluster mapping"
+                )
 
             cluster_uuid = self.cluster_mapping[family]
             if cluster_uuid is None:
@@ -85,7 +90,9 @@ class MispPusher(Karton):
             if type(galaxy_cluster) is not MISPGalaxyCluster:
                 raise Exception(f"Couldn't find galaxy cluster: {str(galaxy_cluster)}")
 
-            self.log.info("Adding tag %s for cluster relationship", galaxy_cluster.tag_name)
+            self.log.info(
+                "Adding tag %s for cluster relationship", galaxy_cluster.tag_name
+            )
             event.add_tag(galaxy_cluster.tag_name)
 
         event.info = f"Malware configuration ({family})"
