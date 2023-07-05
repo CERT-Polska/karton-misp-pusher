@@ -8,6 +8,7 @@ from mwdblib.util import config_dhash  # type: ignore
 from pymisp import ExpandedPyMISP, MISPEvent
 from pymisp.mispevent import MISPGalaxyCluster
 
+
 def http_url(value: str) -> str:
     """Ensure that provided value looks like a HTTP URL (https://sth),
     and strip a trailing slash. The goal is to avoid confusion between
