@@ -25,8 +25,7 @@ class MispPusher(Karton):
     configured MISP instance.
     """
 
-    identity = "karton.misp-pusher-dev"
-    persistent = False
+    identity = "karton.misp-pusher"
     filters = [{"type": "config"}]
 
     # Arbitrary root namespace for MISP UUIDs.
