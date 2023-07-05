@@ -1,11 +1,12 @@
 import argparse
+import json
 from uuid import UUID, uuid5
 
 from karton.core import Config, Karton, Task
 from mwdb_iocextract import parse  # type: ignore
 from mwdblib.util import config_dhash  # type: ignore
 from pymisp import ExpandedPyMISP, MISPEvent
-
+from pymisp.mispevent import MISPGalaxyCluster
 
 def http_url(value: str) -> str:
     """Ensure that provided value looks like a HTTP URL (https://sth),
@@ -23,7 +24,8 @@ class MispPusher(Karton):
     configured MISP instance.
     """
 
-    identity = "karton.misp-pusher"
+    identity = "karton.misp-pusher-dev"
+    persistent = False
     filters = [{"type": "config"}]
 
     # Arbitrary root namespace for MISP UUIDs.
@@ -39,6 +41,12 @@ class MispPusher(Karton):
         if not self.config.get("misp", "key"):
             raise RuntimeError("Misp config section is missing the key parameter")
 
+        self.cluster_mapping = None
+        if self.config.get("misp", "galaxy_clusters_mapping"):
+            with open(self.config.get("misp", "galaxy_clusters_mapping"), "r") as f:
+                self.cluster_mapping = json.load(f)
+                self.log.info("Loaded MISP cluster mappings for %d families", len(self.cluster_mapping.keys()))
+
     def process(self, task: Task) -> None:
         config = task.get_payload("config")
         family = task.headers["family"]
@@ -51,10 +59,34 @@ class MispPusher(Karton):
             # Nothing actionable found - skip the config
             return
 
+        misp = ExpandedPyMISP(
+            http_url(self.config.get("misp", "url")),
+            self.config.get("misp", "key"),
+            not self.config.getboolean("misp", "insecure", False),
+        )
+
         # Upload structured data to MISP
         event = MISPEvent()
         event.uuid = str(uuid5(self.CONFIG_NAMESPACE, dhash))
+
         event.add_tag(f"mwdb:family:{family}")
+
+        if self.cluster_mapping:
+            if family not in self.cluster_mapping:
+                raise KeyError(f"Family name {family} not present in MISP cluster mapping")
+
+            cluster_uuid = self.cluster_mapping[family]
+            if cluster_uuid is None:
+                self.log.info("Family %s ignored in cluster mapping, not reporting it")
+                return
+
+            galaxy_cluster = misp.get_galaxy_cluster(cluster_uuid, pythonify=True)
+            if type(galaxy_cluster) is not MISPGalaxyCluster:
+                raise Exception(f"Couldn't find galaxy cluster: {str(galaxy_cluster)}")
+
+            self.log.info("Adding tag %s for cluster relationship", galaxy_cluster.tag_name)
+            event.add_tag(galaxy_cluster.tag_name)
+
         event.info = f"Malware configuration ({family})"
 
         mwdb_url = self.config.get("misp", "mwdb_url")
@@ -67,11 +99,6 @@ class MispPusher(Karton):
 
         event.published = self.config.getboolean("misp", "published", False)
 
-        misp = ExpandedPyMISP(
-            http_url(self.config.get("misp", "url")),
-            self.config.get("misp", "key"),
-            not self.config.getboolean("misp", "insecure", False),
-        )
         misp.add_event(event)
 
     @classmethod
@@ -100,6 +127,10 @@ class MispPusher(Karton):
             type=http_url,
             help="Optional mwdb url, for `link` MISP attributes",
         )
+        parser.add_argument(
+            "--galaxy-clusters-mapping",
+            help="Link config family names to galaxy clusters using the file",
+        )
         return parser
 
     @classmethod
@@ -113,6 +144,7 @@ class MispPusher(Karton):
                     "published": args.misp_published,
                     "insecure": args.misp_insecure,
                     "mwdb_url": args.mwdb_url,
+                    "galaxy_clusters_mapping": args.galaxy_clusters_mapping,
                 }
             }
         )
