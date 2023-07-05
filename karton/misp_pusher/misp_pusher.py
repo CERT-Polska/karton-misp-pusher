@@ -91,9 +91,9 @@ class MispPusher(Karton):
                 raise Exception(f"Couldn't find galaxy cluster: {str(galaxy_cluster)}")
 
             self.log.info(
-                "Adding tag %s for cluster relationship", galaxy_cluster.tag_name
+                "Adding tag %s for cluster relationship", galaxy_cluster.tag_name  # type: ignore
             )
-            event.add_tag(galaxy_cluster.tag_name)
+            event.add_tag(galaxy_cluster.tag_name)  # type: ignore
 
         event.info = f"Malware configuration ({family})"
 
