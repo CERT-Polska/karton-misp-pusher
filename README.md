@@ -43,7 +43,7 @@ verification with `--misp-insecure`. For more options see `--help`.
 
 It's possible to link new events to existing MISP Galaxy clusters using a mapping file.
 
-The mapping file is a simple JSON document that assings a cluster uuid for each malware family in your ecosystem.
+The mapping file is a simple JSON document that assings a cluster UUID for each malware family in your ecosystem.
 
 An example using the [Malpedia MISP Galaxy would be](https://malpedia.caad.fkie.fraunhofer.de/usage/api#/api/get/misp):
 ```json
