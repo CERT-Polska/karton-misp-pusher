@@ -76,24 +76,28 @@ class MispPusher(Karton):
 
         if self.cluster_mapping:
             if family not in self.cluster_mapping:
-                raise KeyError(
-                    f"Family name {family} not present in MISP cluster mapping"
+                self.log.error(
+                    "Family name %s not present in MISP cluster mapping", family
                 )
+            else:
+                cluster_uuid = self.cluster_mapping[family]
+                if cluster_uuid is None:
+                    self.log.info(
+                        "Family %s ignored in cluster mapping, not reporting it"
+                    )
+                    return
 
-            cluster_uuid = self.cluster_mapping[family]
-            if cluster_uuid is None:
-                self.log.info("Family %s ignored in cluster mapping, not reporting it")
-                return
+                galaxy_cluster = misp.get_galaxy_cluster(cluster_uuid, pythonify=True)
+                if type(galaxy_cluster) is not MISPGalaxyCluster:
+                    raise Exception(
+                        f"Couldn't find galaxy cluster: {str(galaxy_cluster)}"
+                    )
 
-            galaxy_cluster = misp.get_galaxy_cluster(cluster_uuid, pythonify=True)
-            if type(galaxy_cluster) is not MISPGalaxyCluster:
-                raise Exception(f"Couldn't find galaxy cluster: {str(galaxy_cluster)}")
-
-            self.log.info(
-                "Adding tag %s for cluster relationship",
-                galaxy_cluster.tag_name,  # type: ignore
-            )
-            event.add_tag(galaxy_cluster.tag_name)  # type: ignore
+                self.log.info(
+                    "Adding tag %s for cluster relationship",
+                    galaxy_cluster.tag_name,  # type: ignore
+                )
+                event.add_tag(galaxy_cluster.tag_name)  # type: ignore
 
         event.info = f"Malware configuration ({family})"
 
