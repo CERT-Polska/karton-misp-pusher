@@ -41,7 +41,7 @@ class MispPusher(Karton):
         if not self.config.get("misp", "key"):
             raise RuntimeError("Misp config section is missing the key parameter")
 
-        self.cluster_mapping = None
+        self.cluster_mapping = {}
         if self.config.get("misp", "galaxy_clusters_mapping"):
             with open(self.config.get("misp", "galaxy_clusters_mapping"), "r") as f:
                 self.cluster_mapping = json.load(f)
@@ -71,7 +71,6 @@ class MispPusher(Karton):
         # Upload structured data to MISP
         event = MISPEvent()
         event.uuid = str(uuid5(self.CONFIG_NAMESPACE, dhash))
-
         event.add_tag(f"mwdb:family:{family}")
 
         if self.cluster_mapping:
