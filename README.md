@@ -54,6 +54,8 @@ An example using the [Malpedia MISP Galaxy would be](https://malpedia.caad.fkie.
 }
 ```
 
+A value can be null, in which case configs of that family will be silently ignored instead of raising an error. This is useful if you want to ignore configs of a particular family.
+
 With that ready you can then launch the karton service with the `--galaxy-clusters-mapping` argument pointing to the file.
 
 
