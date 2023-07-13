@@ -1,5 +1,6 @@
 import argparse
 import json
+import distutils
 from uuid import UUID, uuid5
 
 from karton.core import Config, Karton, Task
@@ -40,6 +41,8 @@ class MispPusher(Karton):
 
         if not self.config.get("misp", "key"):
             raise RuntimeError("Misp config section is missing the key parameter")
+
+        self.tag_events = self.config.getboolean("misp", "tag_events", True)
 
         self.cluster_mapping = {}
         if self.config.get("misp", "galaxy_clusters_mapping"):
@@ -130,6 +133,12 @@ class MispPusher(Karton):
             default=None,
         )
         parser.add_argument(
+            "--misp-tag-events",
+            help="Tag MISP events with mwdb family names",
+            action=argparse.BooleanOptionalAction,
+            default=None,
+        )
+        parser.add_argument(
             "--misp-insecure",
             help="Skip MISP certificate verification",
             action="store_true",
@@ -155,6 +164,7 @@ class MispPusher(Karton):
                     "url": args.misp_url,
                     "key": args.misp_key,
                     "published": args.misp_published,
+                    "tag_events": args.misp_tag_events,
                     "insecure": args.misp_insecure,
                     "mwdb_url": args.mwdb_url,
                     "galaxy_clusters_mapping": args.galaxy_clusters_mapping,
