@@ -127,11 +127,13 @@ class MispPusher(Karton):
             "--misp-published",
             action="store_true",
             help="Publish MISP Events",
+            default=None,
         )
         parser.add_argument(
             "--misp-insecure",
             help="Skip MISP certificate verification",
             action="store_true",
+            default=None,
         )
         parser.add_argument(
             "--mwdb-url",
