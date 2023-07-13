@@ -73,7 +73,9 @@ class MispPusher(Karton):
         # Upload structured data to MISP
         event = MISPEvent()
         event.uuid = str(uuid5(self.CONFIG_NAMESPACE, dhash))
-        event.add_tag(f"mwdb:family:{family}")
+
+        if self.tag_events:
+            event.add_tag(f"mwdb:family:{family}")
 
         if self.cluster_mapping:
             if family not in self.cluster_mapping:
