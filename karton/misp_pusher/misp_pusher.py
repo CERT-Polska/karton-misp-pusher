@@ -1,6 +1,5 @@
 import argparse
 import json
-import distutils
 from uuid import UUID, uuid5
 
 from karton.core import Config, Karton, Task
