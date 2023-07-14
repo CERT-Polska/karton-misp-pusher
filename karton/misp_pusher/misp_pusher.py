@@ -82,7 +82,7 @@ class MispPusher(Karton):
                 cluster_uuid = self.cluster_mapping[family]
                 if cluster_uuid is None:
                     self.log.info(
-                        "Family %s ignored in cluster mapping, not reporting it"
+                        "Family %s ignored in cluster mapping, not reporting it", family
                     )
                     return
 
