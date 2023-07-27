@@ -74,6 +74,8 @@ class MispPusher(Karton):
         event = MISPEvent()
         event.uuid = str(uuid5(self.CONFIG_NAMESPACE, dhash))
 
+        event.add_tag("mwdb:static")
+
         if self.tag_events:
             event.add_tag(f"mwdb:family:{family}")
 
