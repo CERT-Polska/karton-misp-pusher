@@ -1,4 +1,5 @@
-FROM python:3.9
+FROM python:3.10
+SHELL ["/bin/bash", "-c"]
 
 WORKDIR /app/service
 COPY ./requirements.txt ./requirements.txt
