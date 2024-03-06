@@ -68,7 +68,7 @@ class MispPusher(Karton):
             url=http_url(self.config.get("misp", "url")),
             key=self.config.get("misp", "key"),
             ssl=not self.config.getboolean("misp", "insecure", False),
-            timeout=self.config.getint("misp", "timeout", 10)
+            timeout=self.config.getint("misp", "timeout", 10),
         )
 
         # Upload structured data to MISP
