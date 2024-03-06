@@ -3,11 +3,10 @@ import json
 from uuid import UUID, uuid5
 
 from karton.core import Config, Karton, Task
+from mwdb_iocextract import parse  # type: ignore
 from mwdblib.util import config_dhash  # type: ignore
 from pymisp import MISPEvent, PyMISP
 from pymisp.mispevent import MISPGalaxyCluster
-
-from mwdb_iocextract import parse  # type: ignore
 
 
 def http_url(value: str) -> str:
