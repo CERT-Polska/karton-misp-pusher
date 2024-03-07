@@ -5,7 +5,7 @@ from uuid import UUID, uuid5
 from karton.core import Config, Karton, Task
 from mwdb_iocextract import parse  # type: ignore
 from mwdblib.util import config_dhash  # type: ignore
-from pymisp import ExpandedPyMISP, MISPEvent
+from pymisp import MISPEvent, PyMISP
 from pymisp.mispevent import MISPGalaxyCluster
 
 
@@ -64,10 +64,11 @@ class MispPusher(Karton):
             # Nothing actionable found - skip the config
             return
 
-        misp = ExpandedPyMISP(
-            http_url(self.config.get("misp", "url")),
-            self.config.get("misp", "key"),
-            not self.config.getboolean("misp", "insecure", False),
+        misp = PyMISP(
+            url=http_url(self.config.get("misp", "url")),
+            key=self.config.get("misp", "key"),
+            ssl=not self.config.getboolean("misp", "insecure", False),
+            timeout=self.config.getint("misp", "timeout", 10),
         )
 
         # Upload structured data to MISP
