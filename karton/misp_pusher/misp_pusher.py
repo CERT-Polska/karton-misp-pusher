@@ -41,6 +41,10 @@ class MispPusher(Karton):
         if not self.config.get("misp", "key"):
             raise RuntimeError("Misp config section is missing the key parameter")
 
+        self.misp_url = http_url(self.config.get("misp", "url"))
+        self.misp_key = self.config.get("misp", "key")
+        self.misp_ssl = not self.config.getboolean("misp", "insecure", False)
+        self.misp_timeout = self.config.getint("misp", "timeout", 10)
         self.tag_events = self.config.getboolean("misp", "tag_events", True)
 
         self.cluster_mapping = {}
@@ -65,10 +69,10 @@ class MispPusher(Karton):
             return
 
         misp = PyMISP(
-            url=http_url(self.config.get("misp", "url")),
-            key=self.config.get("misp", "key"),
-            ssl=not self.config.getboolean("misp", "insecure", False),
-            timeout=self.config.getint("misp", "timeout", 10),
+            url=self.misp_url,
+            key=self.misp_key,
+            ssl=self.misp_ssl,
+            timeout=self.misp_timeout,
         )
 
         # Upload structured data to MISP
