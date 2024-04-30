@@ -46,6 +46,7 @@ class MispPusher(Karton):
         self.misp_ssl = not self.config.getboolean("misp", "insecure", False)
         self.misp_timeout = self.config.getint("misp", "timeout", 10)
         self.tag_events = self.config.getboolean("misp", "tag_events", True)
+        self.misp_published = self.config.getboolean("misp", "published", False)
 
         self.cluster_mapping = {}
         if self.config.get("misp", "galaxy_clusters_mapping"):
@@ -119,7 +120,7 @@ class MispPusher(Karton):
         for o in iocs.to_misp():
             event.add_object(o)
 
-        event.published = self.config.getboolean("misp", "published", False)
+        event.published = self.misp_published
 
         misp.add_event(event)
 
