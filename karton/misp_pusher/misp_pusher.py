@@ -27,6 +27,7 @@ class MispPusher(Karton):
 
     identity = "karton.misp-pusher"
     filters = [{"type": "config"}]
+    egress_filters: list = []
 
     # Arbitrary root namespace for MISP UUIDs.
     # Event UUIDs are generated deterministically from a (root, cfg_hash) pair.

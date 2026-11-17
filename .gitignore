@@ -8,3 +8,5 @@ config.py
 build
 karton.ini
 karton_misp_pusher.egg-info/
+build/
+*.egg-info
